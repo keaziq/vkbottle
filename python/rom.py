@@ -88,6 +88,30 @@ async def noknow(message: Message):
 # async def messange_detect(messange: Message):
 #     await messange.answer(messange.text)
 
+@bot.on.chat_message(text=["/погода <city>"])
+async def city_chat(message:Message, city=None):
+    owm = OWM('d6901b7f0e58a81b6e3b55dc1f85fb1e')
+    mgr = owm.weather_manager()
+    observation = mgr.weather_at_place(city)
+    w = observation.weather
+    temperature = w.temperature('celsius')['temp']
+    weather = w.status.lower()
+    wind = w.wind()['speed']
+    humi = w.humidity
+    if weather == "snow":
+        weather = "снег"
+    elif weather == "clouds":
+        weather = "облачно"
+    elif weather == "rain":
+        weather = "дождь"
+
+    ad = (f"По запросу города {city} найдено:\n Температура: {temperature}℃"
+          f"\n Погода: {weather}\n Ветер: {wind} м/с\n Влажность: {humi}%")
+
+    if city is not None:
+        await message.answer(ad)
 
 
-bot.run_forever()
+
+
+bot.startPooling()
