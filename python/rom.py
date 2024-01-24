@@ -1,42 +1,31 @@
+import json
 from vkbottle.bot import Bot, Message
-from vkbottle import Keyboard, KeyboardButtonColor, Text, PhotoMessageUploader, Location, OpenLink, BaseStateGroup
-from pyowm.owm import OWM
-
-
-import os
-
-bot = Bot(token="vk1.a.C_QxUPu1KbMgKjXpWOMc6_5id0Py_Hj5jr3r9GIN1sHDypJLsKkSj6eQnGDM9Wudxy5u57R_w0RuoS-JX5pXYMVBCNRcpmFWYMmiedXp8zci4jckVaMt59Os-3Hanm2v1WLe0byeebKyAftdWe2V_Fy6BrfB5nx1_qg_hWudZVgELW9BvG0o_hqVlHVGMFJN0D4WoghSYVGaycDdmtUs6Q")
-
+from vkbottle import Keyboard, KeyboardButtonColor, Text, PhotoMessageUploader, Location, OpenLink, BaseStateGroup, CtxStorage
+from config import *
+import requests
+import datetime
+from pyowm import OWM
+ctx_storage = CtxStorage()
+bot = Bot(token=token)
+keyboard = Keyboard(one_time=True, inline=False)
+photo_uploader = PhotoMessageUploader(bot.api)
 hello = ["привет",'start','хай',]
-# ('RgKtzg6T5SDl1z3KaOaAvITQZVEXytCs')
-
-class RegData(BaseStateGroup):
-
-    FIND = 1
-
-@bot.on.message(text=['Погода'])
-@bot.on.message(payload={"cmd": "Погода"})
-async def weather_city(message: Message):
 
 
-    await message.answer(
-        message='Введите наименование города: ',
-        keyboard=(
-            Keyboard(one_time=False, inline=False)
-            .add(Text("Назад", {"cmd": "я умею"}), color=KeyboardButtonColor.NEGATIVE)
-        )
-    )
 
+class Weather(BaseStateGroup):
 
+    city = None
 
 
 
 @bot.on.message(text=hello)
 async def message_welcome(message: Message):
-
+    photo_up = PhotoMessageUploader(bot.api)
+    photo = await photo_up.upload("D:/python/Mihaylov/photo/menu.png")
     user = await bot.api.users.get(message.from_id)
     await message.answer(f" Здраствуйте , {user[0].first_name}."
-                         f" Воспользуйтесь командой 'меню' ")
+                         f" Воспользуйтесь командой 'меню' ",attachment=photo)
 
 
 @bot.on.message(text="меню")
@@ -46,7 +35,7 @@ async def menu(message: Message):
 
     keyboard.add(Text("Что ты умеешь?", {"cmd": "я умею"}), color=KeyboardButtonColor.POSITIVE)
     keyboard.add(Text("И что-то?", {"cmd": "2"}), color=KeyboardButtonColor.SECONDARY)
-    keyboard. row()
+    keyboard.row()
     keyboard.add(Location())
     keyboard.add(OpenLink("https://vk.com/club224358783", "Группа сообщества"))
 
@@ -62,6 +51,51 @@ async def menu(message: Message):
 
     await message.answer(message="Вот что я могу",keyboard=keyboard)
 
+@bot.on.message(text=['Погода'])
+@bot.on.private_message(payload={"next": "weather"})
+async def weather(message: Message):
+
+    await message.answer(
+        message='Введите наименование города: ',
+        keyboard=(
+            Keyboard(one_time=True)
+            .add(Text("Назад", {"cmd": "я умею"}), color=KeyboardButtonColor.NEGATIVE)
+        )
+        )
+    await bot.state_dispenser.set(message.peer_id, Weather.city,  message = message)
+    amount = 1
+
+
+@bot.on.message(state=Weather.city)
+async def weather_city(message:Message):
+    ctx_storage.set("city", message.text)
+    await bot.state_dispenser.delete(message.peer_id)
+    weather_api = OWM('e0cb111504a945363e671e0f48faf7af')
+    city = ctx_storage.get("city")
+    message = message.state_peer.payload.get(" message")
+    keyboard = Keyboard(one_time=True)
+    keyboard.add(Text("Другой город", {"next": "weather"}), color=KeyboardButtonColor.NEGATIVE)
+    keyboard.add(Text("Назад", {"back": "start"}), color=KeyboardButtonColor.POSITIVE)
+
+    manager = weather_api.weather_manager()
+    observation = manager.weather_at_place(city)
+    obs = observation.weather()
+    temp = obs.get_temperature('celsius')['temp']
+    wind = obs.wind()['speed']
+    humidity = obs.humidity
+    add_weather = (f"{city} \n Температура: {temp}℃"
+          f"\n Ветер:{wind}м/c\n Влажность: {humidity}%")
+
+    if city is not None:
+        try:
+            await message.answer(add_weather, keyboard=keyboard)
+
+        except:
+
+            await message.answer('Не удачно', keyboard=keyboard)
+
+
+
 @bot.on.message(text="И что-то?")
 @bot.on.message(payload={"cmd": "2"})
 async def menu(message: Message):
@@ -69,6 +103,8 @@ async def menu(message: Message):
     keyboard.add(Text("пока пусто", {"cmd": "пусто"}), color=KeyboardButtonColor.SECONDARY)
     keyboard.add(Text("Назад", {"cmd": "меню"}), color=KeyboardButtonColor.NEGATIVE)
     await message.answer(message="Выберай", keyboard=keyboard)
+
+
 
 @bot.on.private_message(text=['неа'])
 @bot.on.message(payload={"cmd": "нету"})
@@ -80,39 +116,12 @@ async def note(message: Message):
 async def pysto(message: Message):
     await message.answer(message='Тут пока что пусто...',)
 
-@bot.on.chat_message(text=["/погода <city>"])
-async def city_chat(message:Message, city=None):
-    owm = OWM('d6901b7f0e58a81b6e3b55dc1f85fb1e')
-    mgr = owm.weather_manager()
-    observation = mgr.weather_at_place(city)
-    w = observation.weather
-    temperature = w.temperature('celsius')['temp']
-    weather = w.status.lower()
-    wind = w.wind()['speed']
-    humi = w.humidity
-    if weather == "snow":
-        weather = "снег"
-    elif weather == "clouds":
-        weather = "облачно"
-    elif weather == "rain":
-        weather = "дождь"
-
-    ad = (f"По запросу города {city} найдено:\n Температура: {temperature}℃"
-          f"\n Погода: {weather}\n Ветер: {wind} м/с\n Влажность: {humi}%")
-
-    if city is not None:
-        await message.answer(ad)
-
 @bot.on.private_message()
 async def noknow(message: Message):
     await message.answer(message='Я тебя не понимаю, воспользуйся командой "меню" ',)
 # @bot.on.chat_message()
 # async def messange_detect(messange: Message):
 #     await messange.answer(messange.text)
-
-
-
-
 
 
 bot.run_forever()
