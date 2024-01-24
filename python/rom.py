@@ -15,7 +15,7 @@ class RegData(BaseStateGroup):
 
     FIND = 1
 
-@bot.on.private_message(text=['Погода'])
+@bot.on.message(text=['Погода'])
 @bot.on.message(payload={"cmd": "Погода"})
 async def weather_city(message: Message):
 
