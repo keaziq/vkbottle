@@ -1,6 +1,6 @@
 from vkbottle.bot import Bot, Message
 from vkbottle import Keyboard, KeyboardButtonColor, Text, PhotoMessageUploader, Location, OpenLink, BaseStateGroup
-
+from pyowm.owm import OWM
 
 
 import os
