@@ -81,13 +81,6 @@ async def note(message: Message):
 async def pysto(message: Message):
     await message.answer(message='Тут пока что пусто...',)
 
-@bot.on.private_message()
-async def noknow(message: Message):
-    await message.answer(message='Я тебя не понимаю, воспользуйся командой "меню" ',)
-# @bot.on.chat_message()
-# async def messange_detect(messange: Message):
-#     await messange.answer(messange.text)
-
 @bot.on.chat_message(text=["/погода <city>"])
 async def city_chat(message:Message, city=None):
     owm = OWM('d6901b7f0e58a81b6e3b55dc1f85fb1e')
@@ -110,6 +103,15 @@ async def city_chat(message:Message, city=None):
 
     if city is not None:
         await message.answer(ad)
+
+@bot.on.private_message()
+async def noknow(message: Message):
+    await message.answer(message='Я тебя не понимаю, воспользуйся командой "меню" ',)
+# @bot.on.chat_message()
+# async def messange_detect(messange: Message):
+#     await messange.answer(messange.text)
+
+
 
 
 
