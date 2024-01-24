@@ -7,7 +7,7 @@ import os
 
 bot = Bot(token="vk1.a.C_QxUPu1KbMgKjXpWOMc6_5id0Py_Hj5jr3r9GIN1sHDypJLsKkSj6eQnGDM9Wudxy5u57R_w0RuoS-JX5pXYMVBCNRcpmFWYMmiedXp8zci4jckVaMt59Os-3Hanm2v1WLe0byeebKyAftdWe2V_Fy6BrfB5nx1_qg_hWudZVgELW9BvG0o_hqVlHVGMFJN0D4WoghSYVGaycDdmtUs6Q")
 keyboard = Keyboard(one_time=True, inline=False)
-photo_uploader = PhotoMessageUploader(bot.api)
+
 hello = ["привет",'start','хай',]
 # ('RgKtzg6T5SDl1z3KaOaAvITQZVEXytCs')
 
@@ -34,11 +34,10 @@ async def weather_city(message: Message):
 
 @bot.on.message(text=hello)
 async def message_welcome(message: Message):
-    photo_up = PhotoMessageUploader(bot.api)
-    photo = await photo_up.upload("D:/python/Mihaylov/photo/menu.png")
+
     user = await bot.api.users.get(message.from_id)
     await message.answer(f" Здраствуйте , {user[0].first_name}."
-                         f" Воспользуйтесь командой 'меню' ",attachment=photo)
+                         f" Воспользуйтесь командой 'меню' ")
 
 
 @bot.on.message(text="меню")
