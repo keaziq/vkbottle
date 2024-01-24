@@ -9,7 +9,7 @@ bot = Bot(token=token)
 keyboard = Keyboard(one_time=True, inline=False)
 photo_uploader = PhotoMessageUploader(bot.api)
 hello = ["привет",'start','хай',]
-# owm = OWM('RgKtzg6T5SDl1z3KaOaAvITQZVEXytCs')
+# ('RgKtzg6T5SDl1z3KaOaAvITQZVEXytCs')
 
 class RegData(BaseStateGroup):
 
