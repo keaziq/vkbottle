@@ -114,4 +114,4 @@ async def city_chat(message:Message, city=None):
 
 
 
-bot.startPooling()
+bot.run_forever()
