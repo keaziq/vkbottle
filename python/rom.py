@@ -5,7 +5,7 @@ from pyowm.owm import OWM
 
 import os
 
-bot = Bot(token="vk1.a.C_QxUPu1KbMgKjXpWOMc6_5id0Py_Hj5jr3r9GIN1sHDypJLsKkSj6eQnGDM9Wudxy5u57R_w0RuoS-JX5pXYMVBCNRcpmFWYMmiedXp8zci4jckVaMt59Os-3Hanm2v1WLe0byeebKyAftdWe2V_Fy6BrfB5nx1_qg_hWudZVgELW9BvG0o_hqVlHVGMFJN0D4WoghSYVGaycDdmtUs6Q")
+bot = Bot(token="")
 keyboard = Keyboard(one_time=True, inline=False)
 
 hello = ["привет",'start','хай',]
