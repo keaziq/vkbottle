@@ -1,1 +1,3 @@
+import pyowm
+token = "vk1.a.hHMpk86LD-qDpLrscN9vz-NV5gYnf5QIU3Cz5-tJAdZdqKP92B2c_XfAtRF5M3rcyUVtr3dl2OG0MPLEwKD0tbj2fcVYF56HCcQx7ZbMBXc8yIWhJSPb_BrJutS6wk0iWRr1_PJalVlp2QveywAdugnYmc6cVZrcfyaPtCWecyoGLGEToTioN-J8Nxc8q4Duy8mlUK--NtZxH24R7v3xxA"
 
