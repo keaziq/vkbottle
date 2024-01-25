@@ -22,7 +22,7 @@ class Weather(BaseStateGroup):
 @bot.on.message(text=hello)
 async def message_welcome(message: Message):
     photo_up = PhotoMessageUploader(bot.api)
-    photo = await photo_up.upload("D:/python/Mihaylov/photo/menu.png")
+    photo = await photo_up.upload("menu.png")
     user = await bot.api.users.get(message.from_id)
     await message.answer(f" Здраствуйте , {user[0].first_name}."
                          f" Воспользуйтесь командой 'меню' ",attachment=photo)
