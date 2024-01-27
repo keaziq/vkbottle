@@ -75,7 +75,7 @@ async def weather_city(message:Message):
 
     keyboard = Keyboard(one_time=True)
   
-    keyboard.add(Text("Назад", {"back": "start"}), color=KeyboardButtonColor.POSITIVE)
+    keyboard.add(Text("Назад", {"cmd": "я умею"}), color=KeyboardButtonColor.POSITIVE)
 
     manager = weather_api.weather_manager()
     observation = manager.weather_at_place(city)
