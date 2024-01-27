@@ -62,19 +62,19 @@ async def weather(message: Message):
             .add(Text("Назад", {"cmd": "я умею"}), color=KeyboardButtonColor.NEGATIVE)
         )
         )
-    await bot.state_dispenser.set(message.peer_id, Weather.city,  message = message)
-    amount = 1
+    await bot.state_dispenser.set(message.peer_id, Weather.city)
+    
 
 
 @bot.on.message(state=Weather.city)
 async def weather_city(message:Message):
     ctx_storage.set("city", message.text)
-    await bot.state_dispenser.delete(message.peer_id)
+
     weather_api = OWM('e0cb111504a945363e671e0f48faf7af')
     city = ctx_storage.get("city")
-    message = message.state_peer.payload.get(" message")
+
     keyboard = Keyboard(one_time=True)
-    keyboard.add(Text("Другой город", {"next": "weather"}), color=KeyboardButtonColor.NEGATIVE)
+  
     keyboard.add(Text("Назад", {"back": "start"}), color=KeyboardButtonColor.POSITIVE)
 
     manager = weather_api.weather_manager()
