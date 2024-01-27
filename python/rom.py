@@ -124,4 +124,4 @@ async def noknow(message: Message):
 #     await messange.answer(messange.text)
 
 
-bot.run_forever()
+await bot.run_forever()
