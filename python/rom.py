@@ -18,7 +18,6 @@ class Weather(BaseStateGroup):
     city = None
 
 
-
 @bot.on.message(text=hello)
 async def message_welcome(message: Message):
     photo_up = PhotoMessageUploader(bot.api)
@@ -58,33 +57,40 @@ async def weather(message: Message):
     await message.answer(
         message='Введите наименование города: ',
         keyboard=(
-            Keyboard(one_time=True)
-            .add(Text("Назад", {"cmd": "я умею"}), color=KeyboardButtonColor.NEGATIVE)
-        )
+            Keyboard(one_time=True).add(Text("Назад", {"cmd": "я умею"}),        color=KeyboardButtonColor.NEGATIVE)
+          )
         )
     await bot.state_dispenser.set(message.peer_id, Weather.city)
-    
+
 
 
 @bot.on.message(state=Weather.city)
 async def weather_city(message:Message):
     ctx_storage.set("city", message.text)
-
     weather_api = OWM('e0cb111504a945363e671e0f48faf7af')
     city = ctx_storage.get("city")
-
     keyboard = Keyboard(one_time=True)
-  
-    keyboard.add(Text("Назад", {"cmd": "я умею"}), color=KeyboardButtonColor.POSITIVE)
+
+    keyboard.add(Text("Назад", {"cmd": "я умею"}), color=KeyboardButtonColor.NEGATIVE)
 
     manager = weather_api.weather_manager()
     observation = manager.weather_at_place(city)
-    obs = observation.weather()
-    temp = obs.get_temperature('celsius')['temp']
+    obs = observation.weather
+    temp = obs.temperature('celsius')['temp']
+    temp_min = obs.temperature('celsius')["temp_min"]
+    temp_max = obs.temperature('celsius')["temp_max"]
     wind = obs.wind()['speed']
     humidity = obs.humidity
+    pressure = obs.pressure['press']
+    clouds = obs.clouds
+   
     add_weather = (f"{city} \n Температура: {temp}℃"
-          f"\n Ветер:{wind}м/c\n Влажность: {humidity}%")
+          f"\n Минимальная температура: {temp_min}℃"
+          f"\n Максимальная температура: {temp_max}℃"
+          f"\n Ветер:{wind} м/c"
+          f"\n Влажность: {humidity}%"
+          f"\n Давление: {pressure} мм.рт.ст"
+          f"\n Облачность: {clouds}%")
 
     if city is not None:
         try:
@@ -97,7 +103,7 @@ async def weather_city(message:Message):
 
 
 @bot.on.message(text="И что-то?")
-@bot.on.message(payload={"cmd": "2"})
+@bot.on.message(payload={"cmd": "пусто"})
 async def menu(message: Message):
     keyboard = Keyboard(one_time=True)
     keyboard.add(Text("пока пусто", {"cmd": "пусто"}), color=KeyboardButtonColor.SECONDARY)
@@ -124,4 +130,4 @@ async def noknow(message: Message):
 #     await messange.answer(messange.text)
 
 
-await bot.run_forever()
+bot.run_forever()
