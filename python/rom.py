@@ -12,7 +12,7 @@ photo_uploader = PhotoMessageUploader(bot.api)
 hello = ["привет",'start','хай',]
 
 
-
+https://replit.com
 class Weather(BaseStateGroup):
 
     city = None
