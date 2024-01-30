@@ -5,6 +5,9 @@ from config import *
 import requests
 import datetime
 from pyowm import OWM
+from googletrans import Translator
+import asyncio
+
 ctx_storage = CtxStorage()
 bot = Bot(token=token)
 keyboard = Keyboard(one_time=True, inline=False)
@@ -12,10 +15,12 @@ photo_uploader = PhotoMessageUploader(bot.api)
 hello = ["привет",'start','хай',]
 
 
-https://replit.com
+
 class Weather(BaseStateGroup):
 
     city = None
+
+
 
 
 @bot.on.message(text=hello)
@@ -45,21 +50,21 @@ async def menu(message: Message):
 async def menu(message: Message):
     keyboard = Keyboard(one_time=True)
     keyboard.add(Text("Погода", {"cmd": "Погода"}), color=KeyboardButtonColor.POSITIVE)
-    keyboard.add(Text("неа", {"cmd": "нету"}), color=KeyboardButtonColor.SECONDARY)
+    keyboard.add(Text("Переводчик", {"cmd": "Переводчик"}), color=KeyboardButtonColor.SECONDARY)
     keyboard.add(Text("Назад", {"cmd": "меню"}), color=KeyboardButtonColor.NEGATIVE)
 
     await message.answer(message="Вот что я могу",keyboard=keyboard)
 
 @bot.on.message(text=['Погода'])
-@bot.on.private_message(payload={"next": "weather"})
 async def weather(message: Message):
-
+  
     await message.answer(
-        message='Введите наименование города: ',
-        keyboard=(
-            Keyboard(one_time=True).add(Text("Назад", {"cmd": "я умею"}),        color=KeyboardButtonColor.NEGATIVE)
-          )
-        )
+    message='Введите наименование города: ',
+    keyboard=(
+    Keyboard(one_time=True)
+    .add(Text("Назад", {"cmd": "я умею"}), color=KeyboardButtonColor.NEGATIVE)
+    )
+    )
     await bot.state_dispenser.set(message.peer_id, Weather.city)
 
 
@@ -83,7 +88,7 @@ async def weather_city(message:Message):
     humidity = obs.humidity
     pressure = obs.pressure['press']
     clouds = obs.clouds
-   
+
     add_weather = (f"{city} \n Температура: {temp}℃"
           f"\n Минимальная температура: {temp_min}℃"
           f"\n Максимальная температура: {temp_max}℃"
@@ -112,15 +117,37 @@ async def menu(message: Message):
 
 
 
-@bot.on.private_message(text=['неа'])
-@bot.on.message(payload={"cmd": "нету"})
-async def note(message: Message):
-    await message.answer(message='Тут пока что ничего нет...',keyboard=keyboard)
+@bot.on.private_message(text=['Переводчик'])
+@bot.on.message(payload={"cmd": "Переводчик"})
+async def note_handler(message: Message):
+    translate = Translator()
+    lang = translate.detect(message.text)
+    lang = lang.lang
+    if lang == 'ru':
+      send = translate.translate(message.text)
+      await message.answer(message, '------\n'+ send.text +'\n------')
+    
+    else:
+      send = translate.translate(message.text, dest='ru')
+      await message.answer(message, '------\n'+ send.text +'\n------')
+    
+# @bot.on.message(state=Translate.translator) 
+# async def translator_text(message: Message):
+#     ctx_storage.set("translator",message.text)
+#     translator = ctx_storage.get("translator") 
 
+#     keyboard = Keyboard(one_time=True)
+#     keyboard.add(Text("Назад", {"cmd": "я умею"}), color=KeyboardButtonColor.NEGATIVE)
+    
+#     translator = Translator(from_lang="English",to_lang="russian")
+#     text_rus = translator
+#     text_eng = translator.translate(text_rus)
+#     await message.answer(text_eng, keyboard=keyboard)
+  
 @bot.on.private_message(text=['пока пусто'])
 @bot.on.message(payload={"cmd": "пусто"})
 async def pysto(message: Message):
-    await message.answer(message='Тут пока что пусто...',)
+    await message.answer(message="пусто", keyboard=keyboard)
 
 @bot.on.private_message()
 async def noknow(message: Message):
