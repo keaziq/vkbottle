@@ -14,7 +14,7 @@ keyboard = Keyboard(one_time=True, inline=False)
 photo_uploader = PhotoMessageUploader(bot.api)
 hello = ["привет",'start','хай',]
 
-
+https://github.com/mihail342/Telegram_bot_translator/blob/main/bot.py#L45
 
 class Weather(BaseStateGroup):
 
