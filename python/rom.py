@@ -1,11 +1,12 @@
 import json
 from vkbottle.bot import Bot, Message
 from vkbottle import Keyboard, KeyboardButtonColor, Text, PhotoMessageUploader, Location, OpenLink, BaseStateGroup, CtxStorage
+from vkbottle.tools.dev.mini_types.bot.message import message_min
 from config import *
 import requests
 import datetime
 from pyowm import OWM
-from googletrans import Translator
+from translate import Translator
 import asyncio
 
 ctx_storage = CtxStorage()
@@ -13,7 +14,16 @@ bot = Bot(token=token)
 keyboard = Keyboard(one_time=True, inline=False)
 photo_uploader = PhotoMessageUploader(bot.api)
 hello = ["привет",'start','хай',]
+ru_letters = "aбвгдеёжзийклмнопрстуфхцчшщъыьэюя"
+en_letters = "abcdefghijklmnopqrstuvwxyz"
 
+
+
+
+
+class Translate(BaseStateGroup):
+
+  translator = None
 
 class Weather(BaseStateGroup):
 
@@ -56,7 +66,7 @@ async def menu(message: Message):
 
 @bot.on.message(text=['Погода'])
 async def weather(message: Message):
-  
+
     await message.answer(
     message='Введите наименование города: ',
     keyboard=(
@@ -117,32 +127,52 @@ async def menu(message: Message):
 
 
 @bot.on.private_message(text=['Переводчик'])
-@bot.on.message(payload={"cmd": "Переводчик"})
 async def note_handler(message: Message):
-    translate = Translator()
-    lang = translate.detect(message.text)
-    lang = lang.lang
-    if lang == 'ru':
-      send = translate.translate(message.text)
-      await message.answer(message, '------\n'+ send.text +'\n------')
+    text = message.text
     
-    else:
-      send = translate.translate(message.text, dest='ru')
-      await message.answer(message, '------\n'+ send.text +'\n------')
-    
-# @bot.on.message(state=Translate.translator) 
-# async def translator_text(message: Message):
-#     ctx_storage.set("translator",message.text)
-#     translator = ctx_storage.get("translator") 
 
-#     keyboard = Keyboard(one_time=True)
-#     keyboard.add(Text("Назад", {"cmd": "я умею"}), color=KeyboardButtonColor.NEGATIVE)
+@bot.on.message(state=Translate.translator) 
+async def translator_text(message: Message):
+    ctx_storage.set("translator",message.text)
+    translator = ctx_storage.get("translator") 
+    text = message.text
+    keyboard = Keyboard(one_time=True)
+    keyboard.add(Text("Назад", {"cmd": "я умею"}), color=KeyboardButtonColor.NEGATIVE)
+
+    if text[0].lower() in ru_letters:
+      translator = message
+      translator = Translator(from_lang="russian", to_lang='english')
+
+    elif text[0].lower() in en_letters:  
+      translator = Translator(from_lang="english", to_lang='russian')
+      
+    else:
+
+      await message.answer("Я тебя не понял")
+      return
+    translation = translator.translate(text)  
+
+    if translator is not None:
+      
+      try:
+           await message.answer translation, keyboard=keyboard)
+      except:
+           await message.answer('не вышло', keyboard=keyboard)
     
-#     translator = Translator(from_lang="English",to_lang="russian")
-#     text_rus = translator
-#     text_eng = translator.translate(text_rus)
-#     await message.answer(text_eng, keyboard=keyboard)
-  
+
+
+    # translate = Translator()
+    # lang = translate.detect(message.text)
+    # lang = lang.lang
+    # if lang == 'ru':
+    #   send = translate.translate(message.text)
+    #   await message.answer(message, '------\n'+ send.text +'\n------')
+
+    # else:
+    #   send = translate.translate(message.text, dest='ru')
+    #   await message.answer(message, '------\n'+ send.text +'\n------')
+
+
 @bot.on.private_message(text=['пока пусто'])
 @bot.on.message(payload={"cmd": "пусто"})
 async def pysto(message: Message):
