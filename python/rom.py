@@ -138,27 +138,24 @@ async def translator_text(message: Message):
     text = message.text
     keyboard = Keyboard(one_time=True)
     keyboard.add(Text("Назад", {"cmd": "я умею"}), color=KeyboardButtonColor.NEGATIVE)
-
+   
+ 
     if text[0].lower() in ru_letters:
       translator = message
       translator = Translator(from_lang="russian", to_lang='english')
-
+ 
+      
     elif text[0].lower() in en_letters:  
       translator = Translator(from_lang="english", to_lang='russian')
+    
       
     else:
-
       await message.answer("Я тебя не понял")
       return
-    translation = translator.translate(text)  
-
-    if translator is not None:
       
-      try:
-           await message.answer translation, keyboard=keyboard)
-      except:
-           await message.answer('не вышло', keyboard=keyboard)
-    
+    translation = translator.translate(text) 
+    await message.answer (translation, keyboard=keyboard)
+     
 
 
     # translate = Translator()
